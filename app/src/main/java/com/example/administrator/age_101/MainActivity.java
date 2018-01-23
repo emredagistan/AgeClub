@@ -8,8 +8,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -21,7 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -35,7 +33,8 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import java.util.zip.Inflater;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -43,7 +42,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //private static final int CONTENT_VIEW_ID = 10101010;
 
     private ViewFlipper vf;
-    private Button qrButton, qrCreate;
     private ImageView generatedQR;
     private TextView qrContent, personalInfo;
     private Toast qrToast;
@@ -74,11 +72,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
+
+        // TEST STATE //
+        Discount d1 = new Discount("AAAAAA");
+        Discount d2 = new Discount("BBBBBB");
+        List<Discount> dcs = new ArrayList<>();
+        dcs.add(d1);
+        dcs.add(d2);
+        // TEST STATE //
+
+
         generatedQR = (ImageView)findViewById(R.id.myImageQR);
-        qrButton = (Button)findViewById(R.id.qr_button);
-        qrCreate = (Button)findViewById(R.id.qrCreate);
+        Button qrButton = (Button)findViewById(R.id.qr_button);
+        Button qrCreate = (Button)findViewById(R.id.qrCreate);
         qrContent = (TextView)findViewById(R.id.qrContent);
         personalInfo = (TextView)findViewById(R.id.personalInfo);
+
+        final ListView dc = (ListView)findViewById(R.id.discountContent);
+        DiscountAdapter da = new DiscountAdapter(this, dcs);
+        dc.setAdapter(da);
 
         vf = (ViewFlipper)findViewById(R.id.vf);
 
@@ -184,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_main){
-            vf.setDisplayedChild(0);
+            vf.setDisplayedChild(0); //main
         } else if (id == R.id.nav_camera) {
             vf.setDisplayedChild(1);//qr code
         } else if (id == R.id.nav_gallery) {
