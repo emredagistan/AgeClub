@@ -13,8 +13,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 import android.support.annotation.NonNull;
@@ -38,6 +40,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private final static int REQUEST_lOCATION=90;
     static final LatLng AgeKonum = new LatLng(39.9046083, 32.8650663);
     static final LatLng EsatDortYol = new LatLng(39.9095337,32.8621499);
+    static final LatLng CankayaHastanesi = new LatLng(39.904623,32.863391);
+    static final LatLng YildizAspava = new LatLng(39.9052647,32.8655242);
+    static final LatLng PorsukGiyim = new LatLng(39.9087027,32.8619281);
     static final LatLng kizilay = new LatLng(39.9198004,32.8545718);
 
 
@@ -79,41 +84,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
         });
 
-        Button btnGo = findViewById(R.id.btn_Go);
 
-        btnGo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                EditText etLocation = findViewById(R.id.et_location);
-
-                String location = etLocation.getText().toString();
-
-
-                List<Address> addressList = null;
-
-                if(!location.equals("")){
-
-
-                    try {
-                        Geocoder geocoder = new Geocoder(MapActivity.this);
-                        addressList = geocoder.getFromLocationName(location,1);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
-                    if(addressList != null && addressList.size() > 0){
-                        LatLng latLng = new LatLng(addressList.get(0).getLatitude(),addressList.get(0).getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(latLng).title("Burası "+location));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-                    }
-                    else{
-                        Toast.makeText(getApplicationContext(), "Sonuç Bulunamadı!", Toast.LENGTH_SHORT).show();
-                    }
-
-                }
-            }
-        });
     }
 
 
@@ -124,6 +95,43 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         // Ankarayı ekledim harita ilk açıldığında
         if(mMap != null)
         {
+
+            Spinner sp = (Spinner) findViewById(R.id.spinner);
+
+            sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int selected, long l) {
+
+                    switch (selected){
+                        case 0: Toast.makeText(getApplicationContext(),"Seçim Yapınız", Toast.LENGTH_LONG).show();
+                        break;
+                        case 1:
+                            mMap.clear();
+                            mMap.addMarker(new MarkerOptions().position(PorsukGiyim).title("Porsuk Alternetif Giyim"));
+                        break;
+                        case 2:
+                            mMap.clear();
+                            mMap.addMarker(new MarkerOptions().position(YildizAspava).title("Yıldız Aspava"));
+                        break;
+                        case 3:
+                            mMap.clear();
+                            mMap.addMarker(new MarkerOptions().position(CankayaHastanesi).title("Özel Çankaya Hastanesi"));
+
+                        break;
+                    }
+
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+
+
+
+
+
             mMap.addMarker(new MarkerOptions().position(EsatDortYol)
                     .title("EsatDört Yol"));
             mMap.addMarker(new MarkerOptions().position(AgeKonum)
