@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -24,8 +25,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -33,6 +39,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         intent = getIntent();
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -66,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         User myUser = gsonUser.fromJson(userData, User.class);//User.getInstance();
         myUser.setInstance();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -74,28 +81,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         // TEST STATE //
-        Discount d1 = new Discount("AAAAAA");
-        Discount d2 = new Discount("BBBBBB");
+        /*Discount d1 = new Discount();
+        Discount d2 = new Discount();
+        d1.setCampaignName("AA");
+        d2.setCampaignName("BB");
         List<Discount> dcs = new ArrayList<>();
         dcs.add(d1);
-        dcs.add(d2);
+        dcs.add(d2);*/
         // TEST STATE //
 
 
-        generatedQR = (ImageView)findViewById(R.id.myImageQR);
-        Button qrButton = (Button)findViewById(R.id.qr_button);
-        Button qrCreate = (Button)findViewById(R.id.qrCreate);
-        qrContent = (TextView)findViewById(R.id.qrContent);
-        personalInfo = (TextView)findViewById(R.id.personalInfo);
+        generatedQR = findViewById(R.id.myImageQR);
+        Button qrButton = findViewById(R.id.qr_button);
+        Button qrCreate = findViewById(R.id.qrCreate);
+        qrContent = findViewById(R.id.qrContent);
+        personalInfo = findViewById(R.id.personalInfo);
 
-        final ListView dc = (ListView)findViewById(R.id.discountContent);
-        DiscountAdapter da = new DiscountAdapter(this, dcs);
-        dc.setAdapter(da);
-
-        vf = (ViewFlipper)findViewById(R.id.vf);
+        vf = findViewById(R.id.vf);
 
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.userID))
@@ -159,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -204,7 +209,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MainActivity.this.startActivity(mapIntent);
             //vf.setDisplayedChild(2);//map
         } else if (id == R.id.nav_slideshow) {
+            DiscountAdapter discountAdapter = new DiscountAdapter(this, getApplicationContext());
+            DiscountCategorizer discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
+            discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
+            final ListView dc = findViewById(R.id.discountContent);
+
+            dc.setAdapter(discountAdapter);
             vf.setDisplayedChild(3);//discounts
+
         } else if (id == R.id.nav_manage) {
             personalInfo.setText(User.getInstance().getCardId());/* TODO personal info here*/
             vf.setDisplayedChild(4);//personal information

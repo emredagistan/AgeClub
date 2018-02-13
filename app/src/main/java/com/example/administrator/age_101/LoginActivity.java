@@ -118,6 +118,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             }
         });
 
+        //To reset password redirect user to related website
+
         Button mResetPassword = (Button) findViewById(R.id.resetPassword);
         mResetPassword.setOnClickListener(new OnClickListener() {
             @Override
@@ -232,9 +234,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            RequestQueue MyRequestQueue = Volley.newRequestQueue(getApplicationContext());
+
             String url = "http://212.175.137.237/ageClub/Login/";
-            StringRequest MyStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            StringRequest myStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     //This code is executed if the server responds, whether or not the response contains data.
@@ -267,7 +269,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 }
             };
 
-            MyRequestQueue.add(MyStringRequest);
+            VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(myStringRequest);
 
         }
     }

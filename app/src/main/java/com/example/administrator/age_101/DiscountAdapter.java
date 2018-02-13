@@ -11,6 +11,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.List;
 
 
@@ -18,9 +20,18 @@ public class DiscountAdapter extends BaseAdapter {
 
     private LayoutInflater mInflater;
     private List<Discount> discounts;
+    private Context context;
 
-    public DiscountAdapter(Activity activity, List<Discount> discounts) {
+    public DiscountAdapter(Activity activity, Context context) {
         mInflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        this.context = context;
+    }
+
+    public List<Discount> getDiscounts() {
+        return discounts;
+    }
+
+    public void setDiscounts(List<Discount> discounts) {
         this.discounts = discounts;
     }
 
@@ -52,9 +63,9 @@ public class DiscountAdapter extends BaseAdapter {
 
         Discount dc = discounts.get(i);
 
-        textView.setText(dc.getIsim());
-        logo.setImageResource(R.drawable.common_google_signin_btn_icon_dark);/*TODO will be changed to images from url*/
-        image.setImageResource(R.drawable.common_google_signin_btn_icon_light);/*TODO will be changed to images from url*/
+        textView.setText(dc.getCampaignName());
+        Picasso.with(context).load(dc.getLogoUrl()).into(logo);
+        Picasso.with(context).load(dc.getImageLink()).into(image);
 
         return elementView;
     }

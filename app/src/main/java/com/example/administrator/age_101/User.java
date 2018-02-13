@@ -3,6 +3,7 @@ package com.example.administrator.age_101;
 public class User {
 
     //Singleton
+    private static User instance;
 
     private String cardId;
     private String name;
@@ -10,7 +11,6 @@ public class User {
     private String mail;
     private int type;
 
-    private static User instance;
 
     private User(){}
 
