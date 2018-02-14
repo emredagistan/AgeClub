@@ -1,13 +1,20 @@
 package com.example.administrator.age_101;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.content.pm.PackageManager;
+import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -18,6 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -39,9 +47,14 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.Manifest.permission.READ_CONTACTS;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -124,6 +137,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         integrator.setCameraId(0);
                         integrator.initiateScan();
                     }
+                    else{
+                        Toast.makeText(MainActivity.this, "Bu işlem için öncelikle yetki vermelisiniz.", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -157,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
-
 
     }
 
@@ -209,12 +224,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MainActivity.this.startActivity(mapIntent);
             //vf.setDisplayedChild(2);//map
         } else if (id == R.id.nav_slideshow) {
+
             DiscountAdapter discountAdapter = new DiscountAdapter(this, getApplicationContext());
             DiscountCategorizer discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
             discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
             final ListView dc = findViewById(R.id.discountContent);
-
             dc.setAdapter(discountAdapter);
+
+            dc.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Object o = dc.getItemAtPosition(i);
+                    TextView v = view.findViewById(R.id.discountText);
+                    ImageView discountImage = view.findViewById(R.id.discountImage);
+                    if(requestReadExternalStorage() && requestWriteExternalStorage()){
+                        discountImage.setDrawingCacheEnabled(true);
+                        Bitmap bitmap = discountImage.getDrawingCache();
+                        File root = Environment.getExternalStorageDirectory();
+                        File cachePath = new File(root.getAbsolutePath() + "/DCIM/Camera/image.jpg");
+                        try {
+                            cachePath.createNewFile();
+                            FileOutputStream ostream = new FileOutputStream(cachePath);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+                            ostream.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("text/plain");
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, v.getText());
+                        shareIntent.setType("image/*");
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(cachePath));
+                        startActivity(Intent.createChooser(shareIntent, "Share using"));
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "Bu işlem için öncelikle yetki vermelisiniz.", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
+
             vf.setDisplayedChild(3);//discounts
 
         } else if (id == R.id.nav_manage) {
@@ -257,6 +306,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
     }
+
+    private boolean requestWriteExternalStorage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_REQUEST_CODE);
+                return checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+
+    }
+
+    private boolean requestReadExternalStorage() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, MY_REQUEST_CODE);
+                return checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+            }
+            else {
+                return true;
+            }
+        }
+        else {
+            return true;
+        }
+
+    }
+
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
