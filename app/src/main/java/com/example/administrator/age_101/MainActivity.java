@@ -29,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -37,6 +38,7 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -225,11 +227,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //vf.setDisplayedChild(2);//map
         } else if (id == R.id.nav_slideshow) {
 
-            DiscountAdapter discountAdapter = new DiscountAdapter(this, getApplicationContext());
-            DiscountCategorizer discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
-            discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
+            final DiscountAdapter discountAdapter = new DiscountAdapter(this, getApplicationContext());
+            final DiscountCategorizer discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
             final ListView dc = findViewById(R.id.discountContent);
-            dc.setAdapter(discountAdapter);
+            Spinner sp = findViewById(R.id.spinnerDiscount);
+            discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
+
+            sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int selected, long l) {
+
+                    switch (selected){
+                        case 0:
+                            discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
+                            dc.setAdapter(discountAdapter);
+                            break;
+                        case 1:
+                            discountAdapter.setDiscounts(discountCategorizer.getCategoryA());
+                            dc.setAdapter(discountAdapter);
+                            break;
+                        case 2:
+                            discountAdapter.setDiscounts(discountCategorizer.getCategoryB());
+                            dc.setAdapter(discountAdapter);
+                            break;
+                        case 3:
+
+                            break;
+                    }
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {}
+            });
 
             dc.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

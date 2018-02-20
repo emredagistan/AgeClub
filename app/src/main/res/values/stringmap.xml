@@ -2,7 +2,7 @@
 <resources>
 
     <array name="magaza">
-        <item>Kategoriler</item>
+        <item>Tümü</item>
         <item>Giyim</item>
         <item>Gıda</item>
         <item>Sağlık</item>

@@ -96,14 +96,18 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         if(mMap != null)
         {
 
-            Spinner sp = (Spinner) findViewById(R.id.spinner);
+            Spinner sp = findViewById(R.id.spinner);
 
             sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int selected, long l) {
 
                     switch (selected){
-                        case 0: Toast.makeText(getApplicationContext(),"Seçim Yapınız", Toast.LENGTH_LONG).show();
+                        case 0:
+                            mMap.clear();
+                            mMap.addMarker(new MarkerOptions().position(PorsukGiyim).title("Porsuk Alternetif Giyim"));
+                            mMap.addMarker(new MarkerOptions().position(YildizAspava).title("Yıldız Aspava"));
+                            mMap.addMarker(new MarkerOptions().position(CankayaHastanesi).title("Özel Çankaya Hastanesi"));
                         break;
                         case 1:
                             mMap.clear();
