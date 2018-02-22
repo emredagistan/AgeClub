@@ -97,7 +97,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         {
 
             Spinner sp = findViewById(R.id.spinner);
-
+            sp.setSelection(0);
             sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int selected, long l) {
@@ -132,15 +132,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                 }
             });
 
-
-
-
-
-            mMap.addMarker(new MarkerOptions().position(EsatDortYol)
-                    .title("EsatDört Yol"));
-            mMap.addMarker(new MarkerOptions().position(AgeKonum)
-                    .title("Age Enerji")
-                    .snippet("Age Enerji İnşaat"));
 
             //LatLng myLoc = new LatLng(mMap.getMyLocation().getLongitude(), mMap.getMyLocation().getLongitude());
             // myLoc büyük ihtimalle geç geldiği için program crash veriyor
