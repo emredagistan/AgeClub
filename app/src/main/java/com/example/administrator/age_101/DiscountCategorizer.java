@@ -20,7 +20,9 @@ public class DiscountCategorizer {
 
     private ArrayList <Discount> categoryA; //Giyim
     private ArrayList <Discount> categoryB; //Eğlence
+    private ArrayList <Discount> categoryC; //Sağlık
     private ArrayList <Discount> allCategories;
+    private ArrayList <Discount> showcase;
     private DiscountAdapter discountAdapter;
     private Context context;
 
@@ -28,7 +30,9 @@ public class DiscountCategorizer {
 
         categoryA = new ArrayList<>();
         categoryB = new ArrayList<>();
+        categoryC = new ArrayList<>();
         allCategories = new ArrayList<>();
+        showcase = new ArrayList<>();
         this.context = context;
         this.discountAdapter = discountAdapter;
         getDiscountsData();
@@ -65,11 +69,17 @@ public class DiscountCategorizer {
     private void categorizeDiscounts(ArrayList<Discount> d){
 
         for(int i = 0; i < d.size(); i++){
+            if(d.get(i).getIsShowcase() == 1){
+                showcase.add(d.get(i));
+            }
             if(d.get(i).getCampaignCategory().equals("Giyim")){
                 categoryA.add(d.get(i));
             }
             else if(d.get(i).getCampaignCategory().equals("Eğlence")){
                 categoryB.add(d.get(i));
+            }
+            else if(d.get(i).getCampaignCategory().equals("Sağlık")){
+                categoryC.add(d.get(i));
             }
             allCategories.add(d.get(i));
         }
@@ -87,4 +97,11 @@ public class DiscountCategorizer {
         return categoryB;
     }
 
+    public ArrayList<Discount> getCategoryC() {
+        return categoryC;
+    }
+
+    public ArrayList<Discount> getShowcase() {
+        return showcase;
+    }
 }

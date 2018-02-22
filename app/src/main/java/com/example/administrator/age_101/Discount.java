@@ -11,6 +11,7 @@ public class Discount {
     private int campaignRate;
     private String x;
     private String y;
+    private int isShowcase;
 
 
     public String getCampaignName() {
@@ -75,5 +76,13 @@ public class Discount {
 
     public void setY(String y) {
         this.y = y;
+    }
+
+    public int getIsShowcase() {
+        return isShowcase;
+    }
+
+    public void setIsShowcase(int isShowcase) {
+        this.isShowcase = isShowcase;
     }
 }

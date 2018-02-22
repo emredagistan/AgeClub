@@ -29,10 +29,12 @@
                     android:id="@+id/nav_share"
                     android:icon="@drawable/ic_menu_share"
                     android:title="Bize Ulaşın" />
+                <!--
                 <item
                     android:id="@+id/nav_send"
                     android:icon="@drawable/ic_menu_send"
                     android:title="Dilek ve Öneri" />
+                -->
             </menu>
         </item>
 

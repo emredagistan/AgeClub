@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView qrContent, personalInfo;
     private Toast qrToast;
     Intent intent;
+    private DiscountAdapter discountAdapter;
+    private DiscountCategorizer discountCategorizer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // TEST STATE //
 
 
+
         generatedQR = findViewById(R.id.myImageQR);
         Button qrButton = findViewById(R.id.qr_button);
         Button qrCreate = findViewById(R.id.qrCreate);
@@ -118,9 +121,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        discountAdapter = new DiscountAdapter(this, getApplicationContext());
+        discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
+
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.userID))
                 .setText(User.getInstance().getName() + " " + User.getInstance().getSurname());
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.userMail)).setText(User.getInstance().getMail());
+
+        onNavigationItemSelected(navigationView.getMenu().getItem(0));
 
         qrButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,6 +226,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_main){
+            final ListView dcShowcase = findViewById(R.id.discountShowcase);
+            discountAdapter.setDiscounts(discountCategorizer.getShowcase());
+            dcShowcase.setAdapter(discountAdapter);
+
+            dcShowcase.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                    Object o = dcShowcase.getItemAtPosition(i);
+                    TextView v = view.findViewById(R.id.discountText);
+                    ImageView discountImage = view.findViewById(R.id.discountImage);
+                    if(requestReadExternalStorage() && requestWriteExternalStorage()){
+                        discountImage.setDrawingCacheEnabled(true);
+                        Bitmap bitmap = discountImage.getDrawingCache();
+                        File root = Environment.getExternalStorageDirectory();
+                        File cachePath = new File(root.getAbsolutePath() + "/DCIM/Camera/image.jpg");
+                        try {
+                            cachePath.createNewFile();
+                            FileOutputStream ostream = new FileOutputStream(cachePath);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
+                            ostream.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                        shareIntent.setType("text/plain");
+                        shareIntent.putExtra(Intent.EXTRA_TEXT, v.getText());
+                        shareIntent.setType("image/*");
+                        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(cachePath));
+                        startActivity(Intent.createChooser(shareIntent, "Share using"));
+                    }
+                    else{
+                        Toast.makeText(MainActivity.this, "Bu işlem için öncelikle yetki vermelisiniz.", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
+
             vf.setDisplayedChild(0); //main
         } else if (id == R.id.nav_camera) {
             vf.setDisplayedChild(1);//qr code
@@ -226,11 +271,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             MainActivity.this.startActivity(mapIntent);
             //vf.setDisplayedChild(2);//map
         } else if (id == R.id.nav_slideshow) {
-
-            final DiscountAdapter discountAdapter = new DiscountAdapter(this, getApplicationContext());
-            final DiscountCategorizer discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
             final ListView dc = findViewById(R.id.discountContent);
             Spinner sp = findViewById(R.id.spinnerDiscount);
+
             discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
 
             sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -240,21 +283,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     switch (selected){
                         case 0:
                             discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
-                            dc.setAdapter(discountAdapter);
                             break;
                         case 1:
                             discountAdapter.setDiscounts(discountCategorizer.getCategoryA());
-                            dc.setAdapter(discountAdapter);
                             break;
                         case 2:
                             discountAdapter.setDiscounts(discountCategorizer.getCategoryB());
-                            dc.setAdapter(discountAdapter);
                             break;
                         case 3:
-
+                            discountAdapter.setDiscounts(discountCategorizer.getCategoryC());
                             break;
+
                     }
+                    dc.setAdapter(discountAdapter);
                 }
+
                 @Override
                 public void onNothingSelected(AdapterView<?> adapterView) {}
             });
@@ -297,9 +340,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_manage) {
             personalInfo.setText(User.getInstance().getCardId());/* TODO personal info here*/
             vf.setDisplayedChild(4);//personal information
-        } /*else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_share) {
+            Intent resetPasswordWeb = new Intent("android.intent.action.VIEW",
+                    Uri.parse("http://www.ageenerji.com.tr"));
+            startActivity(resetPasswordWeb);
+        } /*else if (id == R.id.nav_send) {
 
         }*/
 
@@ -366,8 +411,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
     }
-
-
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
