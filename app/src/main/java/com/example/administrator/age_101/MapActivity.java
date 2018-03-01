@@ -84,7 +84,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             }
         });
 
-
     }
 
 
@@ -97,7 +96,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         {
 
             Spinner sp = findViewById(R.id.spinner);
-            sp.setSelection(0);
+
             sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int selected, long l) {

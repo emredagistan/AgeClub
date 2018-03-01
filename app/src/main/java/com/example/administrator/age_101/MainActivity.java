@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         discountAdapter = new DiscountAdapter(this, getApplicationContext());
         discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
+        discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
 
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.userID))
                 .setText(User.getInstance().getName() + " " + User.getInstance().getSurname());
@@ -274,7 +275,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final ListView dc = findViewById(R.id.discountContent);
             Spinner sp = findViewById(R.id.spinnerDiscount);
 
-            discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
+
 
             sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
