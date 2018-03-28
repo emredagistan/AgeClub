@@ -16,10 +16,8 @@ public class QRCodeGenerator {
         timeStamp = DateFormat.getDateTimeInstance().format(new Date());
     }
 
-    @Override
-    public String toString() {
-        return "cardNumber:" + cardNumber + "," +
-                "transactionType:" + transactionType + "," +
-                "time:" + timeStamp;
+    public String getTimeStamp() {
+        return timeStamp;
     }
+
 }

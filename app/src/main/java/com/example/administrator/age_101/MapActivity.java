@@ -37,7 +37,7 @@ import java.util.List;
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private final static int REQUEST_lOCATION=90;
+    private final static int REQUEST_lOCATION = 90;
     static final LatLng AgeKonum = new LatLng(39.9046083, 32.8650663);
     static final LatLng EsatDortYol = new LatLng(39.9095337,32.8621499);
     static final LatLng CankayaHastanesi = new LatLng(39.904623,32.863391);

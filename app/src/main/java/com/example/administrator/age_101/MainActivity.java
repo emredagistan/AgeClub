@@ -65,11 +65,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ViewFlipper vf;
     private ImageView generatedQR;
-    private TextView qrContent, personalInfo;
+    private TextView qrContent, nameTextView, emailTextView, cardNumberTextView;
     private Toast qrToast;
     Intent intent;
-    private DiscountAdapter discountAdapter;
-    private DiscountCategorizer discountCategorizer;
+    private DiscountAdapter discountAdapter, discountAdapterShowcase;
+    private DiscountCategorizer discountCategorizer, discountCategorizerShowcase;
+    private Button changePassword;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,7 +115,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Button qrButton = findViewById(R.id.qr_button);
         Button qrCreate = findViewById(R.id.qrCreate);
         qrContent = findViewById(R.id.qrContent);
-        personalInfo = findViewById(R.id.personalInfo);
+        nameTextView = findViewById(R.id.nameTextView);
+        emailTextView = findViewById(R.id.emailTextView);
+        cardNumberTextView = findViewById(R.id.cardNumberTextView);
+        changePassword = findViewById(R.id.changePassword);
 
         vf = findViewById(R.id.vf);
 
@@ -122,7 +127,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         discountAdapter = new DiscountAdapter(this, getApplicationContext());
+        discountAdapterShowcase = new DiscountAdapter(this, getApplicationContext());
         discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
+        discountCategorizerShowcase = new DiscountCategorizer(getApplicationContext(), discountAdapterShowcase);
         discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
 
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.userID))
@@ -163,9 +170,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     int width = 500;
                     int height = 500;
                     com.google.zxing.Writer writer = new QRCodeWriter();
-                    String text = myQRCode.toString(); // Whatever you need to encode in the QR code
+                    Gson gsonQR = new GsonBuilder().create();
+                    String qrGsonContent = gsonQR.toJson(myQRCode); // Whatever you need to encode in the QR code
+
                     BitMatrix bm = writer
-                            .encode(text, BarcodeFormat.QR_CODE, width, height);
+                            .encode(qrGsonContent, BarcodeFormat.QR_CODE, width, height);
                     Bitmap bitmap = Bitmap.createBitmap(width, height,
                             Bitmap.Config.ARGB_8888);
 
@@ -176,12 +185,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
                     generatedQR.setImageBitmap(bitmap);
-                    Gson gsonQR = new GsonBuilder().create();
-                    String qrGsonContent = gsonQR.toJson(myQRCode);
-                    qrContent.setText(qrGsonContent);
+                    qrContent.setText("Karekod " + User.getInstance().getCardId() + " kart numarası ile, "
+                            + myQRCode.getTimeStamp() + " tarihinde oluşturulmuştur.");
                 } catch (WriterException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        changePassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent changePasswordWeb = new Intent("android.intent.action.VIEW",
+                        Uri.parse("http://www.ageenerji.com.tr"));
+                startActivity(changePasswordWeb);
             }
         });
 
@@ -213,9 +230,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -228,8 +242,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (id == R.id.nav_main){
             final ListView dcShowcase = findViewById(R.id.discountShowcase);
-            discountAdapter.setDiscounts(discountCategorizer.getShowcase());
-            dcShowcase.setAdapter(discountAdapter);
+            discountAdapterShowcase.setDiscounts(discountCategorizerShowcase.getShowcase());
+            dcShowcase.setAdapter(discountAdapterShowcase);
 
             dcShowcase.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -339,7 +353,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             vf.setDisplayedChild(3);//discounts
 
         } else if (id == R.id.nav_manage) {
-            personalInfo.setText(User.getInstance().getCardId());/* TODO personal info here*/
+            nameTextView.setText(User.getInstance().getName() + " " + User.getInstance().getSurname());
+            emailTextView.setText(User.getInstance().getMail());
+            cardNumberTextView.setText(User.getInstance().getCardId());
             vf.setDisplayedChild(4);//personal information
         } else if (id == R.id.nav_share) {
             Intent resetPasswordWeb = new Intent("android.intent.action.VIEW",

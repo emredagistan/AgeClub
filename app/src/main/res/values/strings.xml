@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AGE_1.01</string>
+    <string name="app_name">Age Club</string>
 
     <!-- Strings related to login -->
     <string name="prompt_email">Kart Numarası</string>
@@ -18,8 +18,8 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_main">Age Club</string>
+    <string name="title_activity_maps">Age Club</string>
     <string name="map_mode_normal">NORMAL</string>
     <string name="map_mode_satalite">UYDU</string>
 
