@@ -1,7 +1,6 @@
 package com.example.administrator.age_101;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -12,10 +11,6 @@ import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -34,14 +29,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -51,12 +40,6 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.Manifest.permission.READ_CONTACTS;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -129,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         discountAdapter = new DiscountAdapter(this, getApplicationContext());
         discountAdapterShowcase = new DiscountAdapter(this, getApplicationContext());
         discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
+
         discountCategorizerShowcase = new DiscountCategorizer(getApplicationContext(), discountAdapterShowcase);
         discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
 
@@ -283,7 +267,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             vf.setDisplayedChild(1);//qr code
         } else if (id == R.id.nav_gallery) {
             Intent mapIntent = new Intent(MainActivity.this, MapActivity.class);
-            MainActivity.this.startActivity(mapIntent);
+            mapIntent.putExtra("allCategories", discountCategorizer.getAllCategories());
+            mapIntent.putExtra("categoryA", discountCategorizer.getCategoryA());
+            mapIntent.putExtra("categoryB", discountCategorizer.getCategoryB());
+            mapIntent.putExtra("categoryC", discountCategorizer.getCategoryC());
+            startActivity(mapIntent);
             //vf.setDisplayedChild(2);//map
         } else if (id == R.id.nav_slideshow) {
             final ListView dc = findViewById(R.id.discountContent);

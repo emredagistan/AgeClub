@@ -1,7 +1,9 @@
 package com.example.administrator.age_101;
 
 
-public class Discount {
+import java.io.Serializable;
+
+public class Discount implements Serializable{
 
     private String campaignName;
     private String campaignCategory;
@@ -62,16 +64,16 @@ public class Discount {
         this.campaignRate = campaignRate;
     }
 
-    public String getX() {
-        return x;
+    public Double getX() {
+        return Double.parseDouble(x);
     }
 
     public void setX(String x) {
         this.x = x;
     }
 
-    public String getY() {
-        return y;
+    public Double getY() {
+        return Double.parseDouble(y);
     }
 
     public void setY(String y) {

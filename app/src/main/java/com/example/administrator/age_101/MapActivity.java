@@ -3,19 +3,19 @@ package com.example.administrator.age_101;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 //import android.graphics.Point;
-import android.location.Address;
-import android.location.Geocoder;
 //import android.location.Location;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import android.widget.ZoomControls;
@@ -26,18 +26,20 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 //import com.google.android.gms.maps.model.CircleOptions;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
+
+import java.util.ArrayList;
 //import com.google.android.gms.maps.Projection;
 
-import java.io.IOException;
-import java.util.List;
 
 public class MapActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private final static int REQUEST_lOCATION = 90;
+
     static final LatLng AgeKonum = new LatLng(39.9046083, 32.8650663);
     static final LatLng EsatDortYol = new LatLng(39.9095337,32.8621499);
     static final LatLng CankayaHastanesi = new LatLng(39.904623,32.863391);
@@ -45,11 +47,21 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     static final LatLng PorsukGiyim = new LatLng(39.9087027,32.8619281);
     static final LatLng kizilay = new LatLng(39.9198004,32.8545718);
 
+    ArrayList<Discount> allCategories = new ArrayList<>();
+    ArrayList<Discount> categoryA = new ArrayList<>();
+    ArrayList<Discount> categoryB = new ArrayList<>();
+    ArrayList<Discount> categoryC = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
+
+        allCategories = (ArrayList<Discount>) getIntent().getSerializableExtra("allCategories");
+        categoryA = (ArrayList<Discount>) getIntent().getSerializableExtra("categoryA");
+        categoryB = (ArrayList<Discount>) getIntent().getSerializableExtra("categoryB");
+        categoryC = (ArrayList<Discount>) getIntent().getSerializableExtra("categoryC");
+
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -104,21 +116,51 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     switch (selected){
                         case 0:
                             mMap.clear();
-                            mMap.addMarker(new MarkerOptions().position(PorsukGiyim).title("Porsuk Alternetif Giyim"));
-                            mMap.addMarker(new MarkerOptions().position(YildizAspava).title("Yıldız Aspava"));
-                            mMap.addMarker(new MarkerOptions().position(CankayaHastanesi).title("Özel Çankaya Hastanesi"));
+                            for(int i = 0; i < categoryA.size(); i++){
+                                mMap.addMarker((new MarkerOptions()
+                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_clothing_store))
+                                        .position(new LatLng(categoryA.get(i).getX(), categoryA.get(i).getY()))
+                                        .title(categoryA.get(i).getCampaignName())));
+                            }
+                            for(int i = 0; i < categoryB.size(); i++){
+                                mMap.addMarker((new MarkerOptions()
+                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_night_club))
+                                        .position(new LatLng(categoryB.get(i).getX(), categoryB.get(i).getY()))
+                                        .title(categoryB.get(i).getCampaignName())));
+                            }
+                            for(int i = 0; i < categoryC.size(); i++){
+                                mMap.addMarker((new MarkerOptions()
+                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_local_hospital_black_24dp))
+                                        .position(new LatLng(categoryC.get(i).getX(), categoryC.get(i).getY()))
+                                        .title(categoryC.get(i).getCampaignName())));
+                            }
                         break;
                         case 1:
                             mMap.clear();
-                            mMap.addMarker(new MarkerOptions().position(PorsukGiyim).title("Porsuk Alternetif Giyim"));
+                            for(int i = 0; i < categoryA.size(); i++){
+                                mMap.addMarker((new MarkerOptions()
+                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_clothing_store))
+                                        .position(new LatLng(categoryA.get(i).getX(), categoryA.get(i).getY()))
+                                        .title(categoryA.get(i).getCampaignName())));
+                            }
                         break;
                         case 2:
                             mMap.clear();
-                            mMap.addMarker(new MarkerOptions().position(YildizAspava).title("Yıldız Aspava"));
+                            for(int i = 0; i < categoryB.size(); i++){
+                                mMap.addMarker((new MarkerOptions()
+                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_night_club))
+                                        .position(new LatLng(categoryB.get(i).getX(), categoryB.get(i).getY()))
+                                        .title(categoryB.get(i).getCampaignName())));
+                            }
                         break;
                         case 3:
                             mMap.clear();
-                            mMap.addMarker(new MarkerOptions().position(CankayaHastanesi).title("Özel Çankaya Hastanesi"));
+                            for(int i = 0; i < categoryC.size(); i++){
+                                mMap.addMarker((new MarkerOptions()
+                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_local_hospital_black_24dp))
+                                        .position(new LatLng(categoryC.get(i).getX(), categoryC.get(i).getY()))
+                                        .title(categoryC.get(i).getCampaignName())));
+                            }
 
                         break;
                     }
@@ -134,11 +176,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
             //LatLng myLoc = new LatLng(mMap.getMyLocation().getLongitude(), mMap.getMyLocation().getLongitude());
             // myLoc büyük ihtimalle geç geldiği için program crash veriyor
-            PolylineOptions options = new PolylineOptions().add(AgeKonum).add(EsatDortYol).width(0)
-                    .color(Color.BLUE).visible(true).geodesic(true);
-            mMap.addPolyline(options); // width 0 olduğu için çizgiler invizible
+            //PolylineOptions options = new PolylineOptions().add(AgeKonum).add(EsatDortYol).width(0)
+            //        .color(Color.BLUE).visible(true).geodesic(true);
+            //mMap.addPolyline(options); // width 0 olduğu için çizgiler invizible
 
-            mMap.setTrafficEnabled(true);
+            //mMap.setTrafficEnabled(true);
 
             //mMap.setOnMyLocationChangeListener(new LocationFollow());
         }
@@ -188,4 +230,15 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+
+    private BitmapDescriptor bitmapDescriptorFromVector(Context context, int vectorResId) {
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResId);
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+
 }
