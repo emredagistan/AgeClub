@@ -47,7 +47,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     static final LatLng PorsukGiyim = new LatLng(39.9087027,32.8619281);
     static final LatLng kizilay = new LatLng(39.9198004,32.8545718);
 
-    ArrayList<Discount> allCategories = new ArrayList<>();
     ArrayList<Discount> categoryA = new ArrayList<>();
     ArrayList<Discount> categoryB = new ArrayList<>();
     ArrayList<Discount> categoryC = new ArrayList<>();
@@ -57,11 +56,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        allCategories = (ArrayList<Discount>) getIntent().getSerializableExtra("allCategories");
         categoryA = (ArrayList<Discount>) getIntent().getSerializableExtra("categoryA");
         categoryB = (ArrayList<Discount>) getIntent().getSerializableExtra("categoryB");
         categoryC = (ArrayList<Discount>) getIntent().getSerializableExtra("categoryC");
-
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -103,11 +100,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Ankarayı ekledim harita ilk açıldığında
         if(mMap != null)
         {
 
             Spinner sp = findViewById(R.id.spinner);
+            loadAllCategories(mMap);
 
             sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -116,52 +113,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
                     switch (selected){
                         case 0:
                             mMap.clear();
-                            for(int i = 0; i < categoryA.size(); i++){
-                                mMap.addMarker((new MarkerOptions()
-                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_clothing_store))
-                                        .position(new LatLng(categoryA.get(i).getX(), categoryA.get(i).getY()))
-                                        .title(categoryA.get(i).getCampaignName())));
-                            }
-                            for(int i = 0; i < categoryB.size(); i++){
-                                mMap.addMarker((new MarkerOptions()
-                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_night_club))
-                                        .position(new LatLng(categoryB.get(i).getX(), categoryB.get(i).getY()))
-                                        .title(categoryB.get(i).getCampaignName())));
-                            }
-                            for(int i = 0; i < categoryC.size(); i++){
-                                mMap.addMarker((new MarkerOptions()
-                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_local_hospital_black_24dp))
-                                        .position(new LatLng(categoryC.get(i).getX(), categoryC.get(i).getY()))
-                                        .title(categoryC.get(i).getCampaignName())));
-                            }
+                            loadAllCategories(mMap);
                         break;
                         case 1:
                             mMap.clear();
-                            for(int i = 0; i < categoryA.size(); i++){
-                                mMap.addMarker((new MarkerOptions()
-                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_clothing_store))
-                                        .position(new LatLng(categoryA.get(i).getX(), categoryA.get(i).getY()))
-                                        .title(categoryA.get(i).getCampaignName())));
-                            }
+                            loadACategory(mMap);
                         break;
                         case 2:
                             mMap.clear();
-                            for(int i = 0; i < categoryB.size(); i++){
-                                mMap.addMarker((new MarkerOptions()
-                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_night_club))
-                                        .position(new LatLng(categoryB.get(i).getX(), categoryB.get(i).getY()))
-                                        .title(categoryB.get(i).getCampaignName())));
-                            }
+                            loadBCategory(mMap);
                         break;
                         case 3:
                             mMap.clear();
-                            for(int i = 0; i < categoryC.size(); i++){
-                                mMap.addMarker((new MarkerOptions()
-                                        .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_local_hospital_black_24dp))
-                                        .position(new LatLng(categoryC.get(i).getX(), categoryC.get(i).getY()))
-                                        .title(categoryC.get(i).getCampaignName())));
-                            }
-
+                            loadCCategory(mMap);
                         break;
                     }
 
@@ -238,6 +202,39 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.draw(canvas);
         return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
+
+    private void loadACategory(GoogleMap m){        //Giyim
+        for(int i = 0; i < categoryA.size(); i++){
+            m.addMarker((new MarkerOptions()
+                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_clothing_store))
+                    .position(new LatLng(categoryA.get(i).getX(), categoryA.get(i).getY()))
+                    .title(categoryA.get(i).getCampaignName())));
+        }
+    }
+
+    private void loadBCategory(GoogleMap m){        //Yemek
+        for(int i = 0; i < categoryB.size(); i++){
+            m.addMarker((new MarkerOptions()
+                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_night_club))
+                    .position(new LatLng(categoryB.get(i).getX(), categoryB.get(i).getY()))
+                    .title(categoryB.get(i).getCampaignName())));
+        }
+    }
+
+    private void loadCCategory(GoogleMap m){     //Sağlık
+        for(int i = 0; i < categoryC.size(); i++){
+            m.addMarker((new MarkerOptions()
+                    .icon(bitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_local_hospital_black_24dp))
+                    .position(new LatLng(categoryC.get(i).getX(), categoryC.get(i).getY()))
+                    .title(categoryC.get(i).getCampaignName())));
+        }
+    }
+
+    private void loadAllCategories(GoogleMap m){
+        loadACategory(m);
+        loadBCategory(m);
+        loadCCategory(m);
     }
 
 

@@ -54,6 +54,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DiscountAdapter discountAdapter, discountAdapterShowcase;
     private DiscountCategorizer discountCategorizer, discountCategorizerShowcase;
     private Button changePassword;
+    private NavigationView navigationView;
+    private int lastClickedMenuItemId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         vf = findViewById(R.id.vf);
 
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         discountAdapter = new DiscountAdapter(this, getApplicationContext());
@@ -230,6 +232,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        if(id != R.id.nav_gallery){
+            lastClickedMenuItemId = id;
+        }
 
         if (id == R.id.nav_main){
             final ListView dcShowcase = findViewById(R.id.discountShowcase);
@@ -274,7 +279,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             vf.setDisplayedChild(1);//qr code
         } else if (id == R.id.nav_gallery) {
             Intent mapIntent = new Intent(MainActivity.this, MapActivity.class);
-            mapIntent.putExtra("allCategories", discountCategorizer.getAllCategories());
             mapIntent.putExtra("categoryA", discountCategorizer.getCategoryA());
             mapIntent.putExtra("categoryB", discountCategorizer.getCategoryB());
             mapIntent.putExtra("categoryC", discountCategorizer.getCategoryC());
@@ -375,6 +379,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
     }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        navigationView.getMenu().findItem(lastClickedMenuItemId).setChecked(true);
+    }
+
 
     private boolean requestCamera() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
