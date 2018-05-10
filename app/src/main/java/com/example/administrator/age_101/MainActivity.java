@@ -29,6 +29,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.zxing.BarcodeFormat;
@@ -40,6 +44,8 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -56,6 +62,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Button changePassword;
     private NavigationView navigationView;
     private int lastClickedMenuItemId;
+    private String postTransactionURL = "http://212.175.137.237/ageClub/QR/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -373,11 +380,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        TextView view = (TextView)findViewById(R.id.qrView);
-        view.setText(result.getContents());
+        if(User.getInstance().getType() == 2){
+            Gson gson = new GsonBuilder().create();
+            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+            QRCodeGenerator postQR = gson.fromJson(result.getContents(), QRCodeGenerator.class);
+            final QrTransaction postTransaction = new QrTransaction();
+            postTransaction.setCustomerID(postQR.getCardNumber());
+            postTransaction.setTime(postQR.getTimeStamp());
+            postTransaction.setCompanyID(User.getInstance().getCardId());
 
+            StringRequest myStringRequest = new StringRequest(Request.Method.POST, postTransactionURL, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    //This code is executed if the server responds, whether or not the response contains data.
+                    //The String 'response' contains the server's response.
 
+                    if (response.trim().equals("0")) { //trim response to remove whitespaces
+                        Toast.makeText(getApplicationContext(), "QR gönderme başarısız oldu!", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (response.trim().equals("1")){
+                        Toast.makeText(getApplicationContext(), "QR başarıyla gönderildi!", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Bilinmeyen bir hata oluştu!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //This code is executed if there is an error.
+                    Toast.makeText(getApplicationContext(), "Volley Error!", Toast.LENGTH_SHORT).show();
+                }
+            }) {
+                protected Map<String, String> getParams() {
+                    Map<String, String> MyData = new HashMap<>();
+                    MyData.put("customerID", postTransaction.getCustomerID()); //Add the data you'd like to send to the server.
+                    MyData.put("companyID", postTransaction.getCompanyID());
+                    MyData.put("time", postTransaction.getTime());
+                    return MyData;
+                }
+            };
+            VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(myStringRequest);
+        }
     }
 
     @Override

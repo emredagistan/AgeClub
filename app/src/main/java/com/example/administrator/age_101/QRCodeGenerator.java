@@ -5,14 +5,12 @@ import java.util.Date;
 
 public class QRCodeGenerator {
 
-    String cardNumber;
-    int transactionType;
-    String timeStamp;
+    private String cardNumber;
+    private String timeStamp;
 
     public QRCodeGenerator(){
         User myUser = User.getInstance();
         this.cardNumber = myUser.getCardId();
-        this.transactionType = myUser.getType();
         timeStamp = DateFormat.getDateTimeInstance().format(new Date());
     }
 
@@ -20,4 +18,7 @@ public class QRCodeGenerator {
         return timeStamp;
     }
 
+    public String getCardNumber() {
+        return cardNumber;
+    }
 }
