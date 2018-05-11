@@ -18,7 +18,8 @@
         <TextView
             android:id="@+id/discountText"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_margin="4sp"/>
     </LinearLayout>
 
     <ImageView
