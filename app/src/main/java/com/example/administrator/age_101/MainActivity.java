@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         if (id == R.id.nav_main){
-            final ListView dcShowcase = findViewById(R.id.discountShowcase);
+            /*final ListView dcShowcase = findViewById(R.id.discountShowcase);
             discountAdapterShowcase.setDiscounts(discountCategorizerShowcase.getShowcase());
             dcShowcase.setAdapter(discountAdapterShowcase);
 
@@ -279,7 +279,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
 
                 }
-            });
+            });*/
 
             vf.setDisplayedChild(0); //main
         } else if (id == R.id.nav_camera) {

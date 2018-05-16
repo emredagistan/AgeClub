@@ -5,16 +5,13 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.administrator.age_101.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <ListView
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/discountShowcase"
-        android:dividerHeight="4.0dp">
-    </ListView>
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/age_capital"/>
 
 
 </LinearLayout>
