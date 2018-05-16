@@ -1,4 +1,4 @@
-package com.example.administrator.age_101;
+package age.club.administrator.age_101;
 
 public class User {
 

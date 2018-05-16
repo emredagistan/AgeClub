@@ -1,9 +1,7 @@
-package com.example.administrator.age_101;
+package age.club.administrator.age_101;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
