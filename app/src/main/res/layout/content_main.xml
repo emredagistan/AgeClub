@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context="age.club.administrator.age_101.MainActivity"
+    tools:context="age.AgeClub.administrator.age_102.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
     <ImageView
