@@ -233,7 +233,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             // perform the user login attempt.
             showProgress(true);
 
-            String url = "http://212.175.137.237/ageClub/Login/";
+            String url = "http://176.235.178.215/ageClub/Login/";
             StringRequest myStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {

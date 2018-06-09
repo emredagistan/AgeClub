@@ -2,6 +2,7 @@ package age.AgeClub.administrator.age_102;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 //import android.graphics.Point;
 //import android.location.Location;
@@ -40,25 +41,30 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
     private GoogleMap mMap;
     private final static int REQUEST_lOCATION = 90;
 
-    static final LatLng AgeKonum = new LatLng(39.9046083, 32.8650663);
+    /*static final LatLng AgeKonum = new LatLng(39.9046083, 32.8650663);
     static final LatLng EsatDortYol = new LatLng(39.9095337,32.8621499);
     static final LatLng CankayaHastanesi = new LatLng(39.904623,32.863391);
     static final LatLng YildizAspava = new LatLng(39.9052647,32.8655242);
-    static final LatLng PorsukGiyim = new LatLng(39.9087027,32.8619281);
+    static final LatLng PorsukGiyim = new LatLng(39.9087027,32.8619281);*/
     static final LatLng kizilay = new LatLng(39.9198004,32.8545718);
 
     ArrayList<Discount> categoryA = new ArrayList<>();
     ArrayList<Discount> categoryB = new ArrayList<>();
     ArrayList<Discount> categoryC = new ArrayList<>();
 
+    private Discount d;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
 
-        categoryA = (ArrayList<Discount>) getIntent().getSerializableExtra("categoryA");
-        categoryB = (ArrayList<Discount>) getIntent().getSerializableExtra("categoryB");
-        categoryC = (ArrayList<Discount>) getIntent().getSerializableExtra("categoryC");
+        Intent i = getIntent();
+        d = (Discount)i.getSerializableExtra("discount");
+
+        categoryA = DiscountCategoriesSingleton.getInstance().getCategoryA();
+        categoryB = DiscountCategoriesSingleton.getInstance().getCategoryB();
+        categoryC = DiscountCategoriesSingleton.getInstance().getCategoryC();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -149,7 +155,14 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             //mMap.setOnMyLocationChangeListener(new LocationFollow());
         }
 
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(kizilay,12));
+        if(d != null){
+            LatLng clickedLL = new LatLng(d.getX(), d.getY());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(clickedLL,15));
+        }
+        else {
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(kizilay,12));
+        }
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED ) {

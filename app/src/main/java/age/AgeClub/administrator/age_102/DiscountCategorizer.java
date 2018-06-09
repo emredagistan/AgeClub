@@ -16,27 +16,18 @@ import java.util.ArrayList;
 
 public class DiscountCategorizer {
 
-    private ArrayList <Discount> categoryA; //Giyim
-    private ArrayList <Discount> categoryB; //Eğlence
-    private ArrayList <Discount> categoryC; //Sağlık
-    private ArrayList <Discount> allCategories;
-    private ArrayList <Discount> showcase;
+
     private DiscountAdapter discountAdapter;
     private Context context;
 
     public DiscountCategorizer(Context context, DiscountAdapter discountAdapter){
-        categoryA = new ArrayList<>();
-        categoryB = new ArrayList<>();
-        categoryC = new ArrayList<>();
-        allCategories = new ArrayList<>();
-        showcase = new ArrayList<>();
         this.context = context;
         this.discountAdapter = discountAdapter;
         getDiscountsData();
     }
 
     private void getDiscountsData(){
-        String url = "http://212.175.137.237/ageClub/Discounts/";
+        String url = "http://176.235.178.215/ageClub/Discounts/";
         StringRequest myStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -65,10 +56,12 @@ public class DiscountCategorizer {
 
     private void categorizeDiscounts(ArrayList<Discount> d){
 
+        ArrayList <Discount> categoryA = new ArrayList<>(); //Giyim
+        ArrayList <Discount> categoryB = new ArrayList<>(); //Eğlence
+        ArrayList <Discount> categoryC = new ArrayList<>(); //Sağlık
+        ArrayList <Discount> allCategories = new ArrayList<>();
+
         for(int i = 0; i < d.size(); i++){
-            if(d.get(i).getIsShowcase() == 1){
-                showcase.add(d.get(i));
-            }
             if(d.get(i).getCampaignCategory().equals("Giyim")){
                 categoryA.add(d.get(i));
             }
@@ -80,25 +73,14 @@ public class DiscountCategorizer {
             }
             allCategories.add(d.get(i));
         }
+
+        DiscountCategoriesSingleton dcs = DiscountCategoriesSingleton.getInstance();
+
+        dcs.setCategoryA(categoryA);
+        dcs.setCategoryB(categoryB);
+        dcs.setCategoryC(categoryC);
+        dcs.setAllCategories(allCategories);
+        dcs.setInstance();
     }
 
-    public ArrayList<Discount> getAllCategories(){
-        return allCategories;
-    }
-
-    public ArrayList<Discount> getCategoryA() {
-        return categoryA;
-    }
-
-    public ArrayList<Discount> getCategoryB() {
-        return categoryB;
-    }
-
-    public ArrayList<Discount> getCategoryC() {
-        return categoryC;
-    }
-
-    public ArrayList<Discount> getShowcase() {
-        return showcase;
-    }
 }

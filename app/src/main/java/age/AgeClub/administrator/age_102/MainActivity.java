@@ -57,12 +57,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView qrContent, nameTextView, emailTextView, cardNumberTextView;
     private Toast qrToast;
     Intent intent;
-    private DiscountAdapter discountAdapter, discountAdapterShowcase;
-    private DiscountCategorizer discountCategorizer, discountCategorizerShowcase;
+    private DiscountAdapter discountAdapter;
+    private DiscountCategorizer discountCategorizer;
     private Button changePassword;
     private NavigationView navigationView;
     private int lastClickedMenuItemId;
-    private String postTransactionURL = "http://212.175.137.237/ageClub/QR/";
+    private String postTransactionURL = "http://176.235.178.215/ageClub/QR/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,11 +119,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         discountAdapter = new DiscountAdapter(this, getApplicationContext());
-        discountAdapterShowcase = new DiscountAdapter(this, getApplicationContext());
         discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
 
-        discountCategorizerShowcase = new DiscountCategorizer(getApplicationContext(), discountAdapterShowcase);
-        discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
+        discountAdapter.setDiscounts(DiscountCategoriesSingleton.getInstance().getAllCategories());
 
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.userID))
                 .setText(User.getInstance().getName() + " " + User.getInstance().getSurname());
@@ -286,9 +284,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             vf.setDisplayedChild(1);//qr code
         } else if (id == R.id.nav_gallery) {
             Intent mapIntent = new Intent(MainActivity.this, MapActivity.class);
-            mapIntent.putExtra("categoryA", discountCategorizer.getCategoryA());
-            mapIntent.putExtra("categoryB", discountCategorizer.getCategoryB());
-            mapIntent.putExtra("categoryC", discountCategorizer.getCategoryC());
+            mapIntent.putExtra("categoryA", DiscountCategoriesSingleton.getInstance().getCategoryA());
+            mapIntent.putExtra("categoryB", DiscountCategoriesSingleton.getInstance().getCategoryB());
+            mapIntent.putExtra("categoryC", DiscountCategoriesSingleton.getInstance().getCategoryC());
             startActivity(mapIntent);
             //vf.setDisplayedChild(2);//map
         } else if (id == R.id.nav_slideshow) {
@@ -303,16 +301,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     switch (selected){
                         case 0:
-                            discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
+                            discountAdapter.setDiscounts(DiscountCategoriesSingleton.getInstance().getAllCategories());
                             break;
                         case 1:
-                            discountAdapter.setDiscounts(discountCategorizer.getCategoryA());
+                            discountAdapter.setDiscounts(DiscountCategoriesSingleton.getInstance().getCategoryA());
                             break;
                         case 2:
-                            discountAdapter.setDiscounts(discountCategorizer.getCategoryB());
+                            discountAdapter.setDiscounts(DiscountCategoriesSingleton.getInstance().getCategoryB());
                             break;
                         case 3:
-                            discountAdapter.setDiscounts(discountCategorizer.getCategoryC());
+                            discountAdapter.setDiscounts(DiscountCategoriesSingleton.getInstance().getCategoryC());
                             break;
 
                     }
@@ -326,32 +324,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             dc.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    Object o = dc.getItemAtPosition(i);
-                    TextView v = view.findViewById(R.id.discountText);
-                    ImageView discountImage = view.findViewById(R.id.discountImage);
-                    if(requestReadExternalStorage() && requestWriteExternalStorage()){
-                        discountImage.setDrawingCacheEnabled(true);
-                        Bitmap bitmap = discountImage.getDrawingCache();
-                        File root = Environment.getExternalStorageDirectory();
-                        File cachePath = new File(root.getAbsolutePath() + "/DCIM/Camera/image.jpg");
-                        try {
-                            cachePath.createNewFile();
-                            FileOutputStream ostream = new FileOutputStream(cachePath);
-                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, ostream);
-                            ostream.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                        shareIntent.setType("text/plain");
-                        shareIntent.putExtra(Intent.EXTRA_TEXT, v.getText());
-                        shareIntent.setType("image/*");
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(cachePath));
-                        startActivity(Intent.createChooser(shareIntent, "Share using"));
-                    }
-                    else{
-                        Toast.makeText(MainActivity.this, "Bu işlem için öncelikle yetki vermelisiniz.", Toast.LENGTH_SHORT).show();
-                    }
+
+                    Discount clickedDiscount = (Discount) adapterView.getItemAtPosition(i);
+                    Intent dcInfoIntent = new Intent(MainActivity.this, DiscountDetail.class);
+                    dcInfoIntent.putExtra("discount", clickedDiscount);
+                    startActivity(dcInfoIntent);
 
                 }
             });
@@ -444,38 +421,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (checkSelfPermission(android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(new String[]{android.Manifest.permission.CAMERA}, MY_REQUEST_CODE);
                 return checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
-            }
-            else {
-                return true;
-            }
-        }
-        else {
-            return true;
-        }
-
-    }
-
-    private boolean requestWriteExternalStorage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, MY_REQUEST_CODE);
-                return checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
-            }
-            else {
-                return true;
-            }
-        }
-        else {
-            return true;
-        }
-
-    }
-
-    private boolean requestReadExternalStorage() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, MY_REQUEST_CODE);
-                return checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
             }
             else {
                 return true;
