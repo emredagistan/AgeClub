@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "946236758523",
+    "firebase_url": "https://bildirim-8daff.firebaseio.com",
+    "project_id": "bildirim-8daff",
+    "storage_bucket": "bildirim-8daff.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946236758523:android:1574b37f648eea2f",
+        "android_client_info": {
+          "package_name": "age.AgeClub.administrator.age_102"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "946236758523-d8fbkuccocvp67hcg95vvld4256r1moh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7GfuYvC5vKsZYGtz6raBkz7x5DJKB_hY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
