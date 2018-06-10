@@ -1,6 +1,4 @@
-
-package age.AgeClub.administrator.age_103;
-
+package com.example.administrator.age_101;
 
 public class User {
 
@@ -23,7 +21,6 @@ public class User {
     public void setInstance(){
         instance = this;
     }
-
 
 
     public String getCardId() {

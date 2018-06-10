@@ -1,6 +1,4 @@
-
-package age.AgeClub.administrator.age_103;
-
+package com.example.administrator.age_101;
 
 
 import android.content.Context;

@@ -1,8 +1,7 @@
-
-package age.AgeClub.administrator.age_103;
-
+package com.example.administrator.age_101;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -15,6 +14,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DiscountCategorizer {
 
@@ -27,6 +27,7 @@ public class DiscountCategorizer {
     private Context context;
 
     public DiscountCategorizer(Context context, DiscountAdapter discountAdapter){
+
         categoryA = new ArrayList<>();
         categoryB = new ArrayList<>();
         categoryC = new ArrayList<>();

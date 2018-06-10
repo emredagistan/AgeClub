@@ -1,11 +1,7 @@
-
-package age.AgeClub.administrator.age_103;
-
+package com.example.administrator.age_101;
 
 
-import java.io.Serializable;
-
-public class Discount implements Serializable{
+public class Discount {
 
     private String campaignName;
     private String campaignCategory;
@@ -66,16 +62,16 @@ public class Discount implements Serializable{
         this.campaignRate = campaignRate;
     }
 
-    public Double getX() {
-        return Double.parseDouble(x);
+    public String getX() {
+        return x;
     }
 
     public void setX(String x) {
         this.x = x;
     }
 
-    public Double getY() {
-        return Double.parseDouble(y);
+    public String getY() {
+        return y;
     }
 
     public void setY(String y) {

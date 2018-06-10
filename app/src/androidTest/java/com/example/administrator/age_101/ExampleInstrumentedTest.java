@@ -1,5 +1,4 @@
-package age.AgeClub.administrator.age_103;
-
+package com.example.administrator.age_101;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -22,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.club.administrator.age_101", appContext.getPackageName());
+        assertEquals("com.example.administrator.age_101", appContext.getPackageName());
     }
 }

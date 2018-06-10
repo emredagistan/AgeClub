@@ -1,8 +1,7 @@
-
-package age.AgeClub.administrator.age_103;
-
+package com.example.administrator.age_101;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -13,6 +12,10 @@ import android.os.Bundle;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -35,8 +38,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -46,8 +51,12 @@ import com.google.zxing.qrcode.QRCodeWriter;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+
+import static android.Manifest.permission.READ_CONTACTS;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
 
@@ -56,16 +65,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ViewFlipper vf;
     private ImageView generatedQR;
-    private TextView qrContent, nameTextView, emailTextView, cardNumberTextView;
+    private TextView qrContent, personalInfo;
     private Toast qrToast;
     Intent intent;
-    private DiscountAdapter discountAdapter, discountAdapterShowcase;
-    private DiscountCategorizer discountCategorizer, discountCategorizerShowcase;
-    private Button changePassword;
-    private NavigationView navigationView;
-    private int lastClickedMenuItemId;
-    private String postTransactionURL = "http://212.175.137.237/ageClub/QR/";
-
+    private DiscountAdapter discountAdapter;
+    private DiscountCategorizer discountCategorizer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,23 +113,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Button qrButton = findViewById(R.id.qr_button);
         Button qrCreate = findViewById(R.id.qrCreate);
         qrContent = findViewById(R.id.qrContent);
-        nameTextView = findViewById(R.id.nameTextView);
-        emailTextView = findViewById(R.id.emailTextView);
-        cardNumberTextView = findViewById(R.id.cardNumberTextView);
-        changePassword = findViewById(R.id.changePassword);
+        personalInfo = findViewById(R.id.personalInfo);
 
         vf = findViewById(R.id.vf);
 
 
-        navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         discountAdapter = new DiscountAdapter(this, getApplicationContext());
-        discountAdapterShowcase = new DiscountAdapter(this, getApplicationContext());
         discountCategorizer = new DiscountCategorizer(getApplicationContext(), discountAdapter);
-
-        discountCategorizerShowcase = new DiscountCategorizer(getApplicationContext(), discountAdapterShowcase);
-        discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
 
         ((TextView) navigationView.getHeaderView(0).findViewById(R.id.userID))
                 .setText(User.getInstance().getName() + " " + User.getInstance().getSurname());
@@ -165,11 +162,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     int width = 500;
                     int height = 500;
                     com.google.zxing.Writer writer = new QRCodeWriter();
-                    Gson gsonQR = new GsonBuilder().create();
-                    String qrGsonContent = gsonQR.toJson(myQRCode); // Whatever you need to encode in the QR code
-
+                    String text = myQRCode.toString(); // Whatever you need to encode in the QR code
                     BitMatrix bm = writer
-                            .encode(qrGsonContent, BarcodeFormat.QR_CODE, width, height);
+                            .encode(text, BarcodeFormat.QR_CODE, width, height);
                     Bitmap bitmap = Bitmap.createBitmap(width, height,
                             Bitmap.Config.ARGB_8888);
 
@@ -180,20 +175,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
                     generatedQR.setImageBitmap(bitmap);
-                    qrContent.setText("Karekod " + User.getInstance().getCardId() + " kart numarası ile, "
-                            + myQRCode.getTimeStamp() + " tarihinde oluşturulmuştur.");
+                    Gson gsonQR = new GsonBuilder().create();
+                    String qrGsonContent = gsonQR.toJson(myQRCode);
+                    qrContent.setText(qrGsonContent);
                 } catch (WriterException e) {
                     e.printStackTrace();
                 }
-            }
-        });
-
-        changePassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent changePasswordWeb = new Intent("android.intent.action.VIEW",
-                        Uri.parse("http://www.ageenerji.com.tr"));
-                startActivity(changePasswordWeb);
             }
         });
 
@@ -205,9 +192,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } /*else {
+        } else {
             super.onBackPressed();
-        }*/
+        }
     }
 
     @Override
@@ -224,14 +211,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) { //Logout
-            Intent logoutIntent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(logoutIntent);
-            finish();
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
             return true;
         }
-
-        //noinspection SimplifiableIfStatement
 
         return super.onOptionsItemSelected(item);
     }
@@ -241,14 +224,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if(id != R.id.nav_gallery){
-            lastClickedMenuItemId = id;
-        }
 
         if (id == R.id.nav_main){
-            /*final ListView dcShowcase = findViewById(R.id.discountShowcase);
-            discountAdapterShowcase.setDiscounts(discountCategorizerShowcase.getShowcase());
-            dcShowcase.setAdapter(discountAdapterShowcase);
+            final ListView dcShowcase = findViewById(R.id.discountShowcase);
+            discountAdapter.setDiscounts(discountCategorizer.getShowcase());
+            dcShowcase.setAdapter(discountAdapter);
 
             dcShowcase.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
@@ -281,23 +261,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
 
                 }
-            });*/
+            });
 
             vf.setDisplayedChild(0); //main
         } else if (id == R.id.nav_camera) {
             vf.setDisplayedChild(1);//qr code
         } else if (id == R.id.nav_gallery) {
             Intent mapIntent = new Intent(MainActivity.this, MapActivity.class);
-            mapIntent.putExtra("categoryA", discountCategorizer.getCategoryA());
-            mapIntent.putExtra("categoryB", discountCategorizer.getCategoryB());
-            mapIntent.putExtra("categoryC", discountCategorizer.getCategoryC());
-            startActivity(mapIntent);
+            MainActivity.this.startActivity(mapIntent);
             //vf.setDisplayedChild(2);//map
         } else if (id == R.id.nav_slideshow) {
             final ListView dc = findViewById(R.id.discountContent);
             Spinner sp = findViewById(R.id.spinnerDiscount);
 
-
+            discountAdapter.setDiscounts(discountCategorizer.getAllCategories());
 
             sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -361,9 +338,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             vf.setDisplayedChild(3);//discounts
 
         } else if (id == R.id.nav_manage) {
-            nameTextView.setText(User.getInstance().getName() + " " + User.getInstance().getSurname());
-            emailTextView.setText(User.getInstance().getMail());
-            cardNumberTextView.setText(User.getInstance().getCardId());
+            personalInfo.setText(User.getInstance().getCardId());/* TODO personal info here*/
             vf.setDisplayedChild(4);//personal information
         } else if (id == R.id.nav_share) {
             Intent resetPasswordWeb = new Intent("android.intent.action.VIEW",
@@ -382,64 +357,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(User.getInstance().getType() == 2){
-            Gson gson = new GsonBuilder().create();
-            IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-            if(result.getContents() != null){
-                try{
-                    QRCodeGenerator postQR = gson.fromJson(result.getContents(), QRCodeGenerator.class);
-                    final QrTransaction postTransaction = new QrTransaction();
-                    postTransaction.setCustomerID(postQR.getCardNumber());
-                    postTransaction.setTime(postQR.getTimeStamp());
-                    postTransaction.setCompanyID(User.getInstance().getCardId());
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        TextView view = (TextView)findViewById(R.id.qrView);
+        view.setText(result.getContents());
 
 
-                    StringRequest myStringRequest = new StringRequest(Request.Method.POST, postTransactionURL, new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            //This code is executed if the server responds, whether or not the response contains data.
-                            //The String 'response' contains the server's response.
-
-                            if (response.trim().equals("0")) { //trim response to remove whitespaces
-                                Toast.makeText(getApplicationContext(), "QR gönderme başarısız oldu!", Toast.LENGTH_SHORT).show();
-                            }
-                            else if (response.trim().equals("1")){
-                                Toast.makeText(getApplicationContext(), "QR başarıyla gönderildi!", Toast.LENGTH_SHORT).show();
-                            }
-                            else {
-                                Toast.makeText(getApplicationContext(), "Bilinmeyen bir hata oluştu!", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    }, new Response.ErrorListener() { //Create an error listener to handle errors appropriately.
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            //This code is executed if there is an error.
-                            Toast.makeText(getApplicationContext(), "Volley Error!", Toast.LENGTH_SHORT).show();
-                        }
-                    }) {
-                        protected Map<String, String> getParams() {
-                            Map<String, String> MyData = new HashMap<>();
-                            MyData.put("customerID", postTransaction.getCustomerID()); //Add the data you'd like to send to the server.
-                            MyData.put("companyID", postTransaction.getCompanyID());
-                            MyData.put("time", postTransaction.getTime());
-                            return MyData;
-                        }
-                    };
-                    VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(myStringRequest);
-                }
-                catch (Exception e){
-                    Toast.makeText(getApplicationContext(), "Uyumsuz QR algılandı!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }
     }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        navigationView.getMenu().findItem(lastClickedMenuItemId).setChecked(true);
-    }
-
 
     private boolean requestCamera() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
